@@ -1,0 +1,11 @@
+pydantic
+langchain-core
+langchain-text-splitters
+langchain-community
+chromadb
+langchain-huggingface
+sentence-transformers
+langchain-openai
+python-dotenv
+requests
+beautifulsoup4
