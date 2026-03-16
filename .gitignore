@@ -17,3 +17,5 @@ data/*.backup-*.json
 *.log
 streamlit.out.log
 streamlit.err.log
+
+wifi_reconnect.ps1
