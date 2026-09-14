@@ -1,11 +1,11 @@
 ﻿from dotenv import load_dotenv
 import html
 import math
+import os
 import re
 
 import streamlit as st
 
-from src.llm_engine import TBJPOracleLLM
 from src.vector_store import TBJPVectorStore
 
 load_dotenv()
@@ -16,9 +16,14 @@ st.set_page_config(page_title="TBJP Oracle", page_icon="||||-----||||", layout="
 @st.cache_resource
 def init_system():
     db = TBJPVectorStore()
-    retriever = db.get_retriever(target_results=5)
-    qa_chain = TBJPOracleLLM().build_qa_chain(retriever)
-    return db, qa_chain
+    return db
+
+
+@st.cache_resource
+def init_qa_chain():
+    from src.llm_engine import TBJPOracleLLM
+
+    return TBJPOracleLLM().build_qa_chain(init_system().get_retriever(target_results=5))
 
 
 def parse_query_tokens(query: str) -> tuple[list[str], list[str]]:
@@ -78,7 +83,7 @@ def render_source_document(doc, highlight_query: str = "", show_send_button: boo
             st.markdown("---")
             st.markdown(doc.page_content)
 
-        if show_send_button:
+        if show_send_button and os.getenv("GOOGLE_API_KEY"):
             st.markdown("---")
             if st.button("Send to Oracle for Analysis", key=f"oracle_{post_id}"):
                 st.session_state.app_mode = "Oracle //Chat"
@@ -90,7 +95,7 @@ st.title("TBJP Oracle")
 st.markdown("### Structural Bodybuilding & Coaching RAG POC")
 
 try:
-    db, qa_chain = init_system()
+    db = init_system()
 except Exception as e:
     st.error(f"Initialization failed: {e}")
     st.stop()
@@ -110,7 +115,15 @@ if "focus_doc" not in st.session_state:
 if "app_mode" not in st.session_state:
     st.session_state.app_mode = "Consultant //Wiki"
 
-mode = st.sidebar.radio("Select Mode", ["Consultant //Wiki", "Oracle //Chat"], key="app_mode")
+google_api_key_available = bool(os.getenv("GOOGLE_API_KEY"))
+available_modes = ["Consultant //Wiki"]
+if google_api_key_available:
+    available_modes.append("Oracle //Chat")
+else:
+    st.sidebar.info("Oracle chat requires GOOGLE_API_KEY. Search is available without it.")
+    st.session_state.app_mode = "Consultant //Wiki"
+
+mode = st.sidebar.radio("Select Mode", available_modes, key="app_mode")
 
 if mode == "Consultant //Wiki":
     st.info("Directly search the raw logbook archives. No AI synthesis.")
@@ -215,6 +228,11 @@ if mode == "Consultant //Wiki":
         st.warning("No matching entries found for this query.")
 
 elif mode == "Oracle //Chat":
+    try:
+        qa_chain = init_qa_chain()
+    except Exception as e:
+        st.error(f"Oracle initialization failed: {e}")
+        st.stop()
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])

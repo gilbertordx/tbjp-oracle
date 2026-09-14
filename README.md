@@ -30,7 +30,7 @@ pip install -r requirements.txt
 pip install langchain-google-genai
 ```
 
-Create a `.env` file with your Gemini credentials:
+Oracle chat requires a `.env` file with your Gemini credentials. Without it, the Consultant search mode still works:
 
 ```
 GOOGLE_API_KEY=your-key-here
@@ -61,6 +61,8 @@ python ingest.py
 ```bash
 streamlit run app.py
 ```
+
+If you have no Google API key, leave `.env` absent. The app will show only the Consultant search mode. To run against the bundled raw archive, run `python ingest.py` once before starting Streamlit. If Chroma's embedding packages are unavailable, ingestion uses the local keyword fallback instead of semantic search.
 
 > Don't run `ingest.py` and `streamlit run app.py` at the same time — both can write to the Chroma store at `data/chroma_db`, and concurrent writes will corrupt it.
 
