@@ -78,7 +78,7 @@ def render_source_document(doc, highlight_query: str = "", show_send_button: boo
         if show_send_button:
             st.markdown("---")
             st.button(
-                "Analyze with AI (Experimental)", key=f"analyze_{post_id}", disabled=True,
+                "Ask the Archive (Experimental)", key=f"analyze_{post_id}", disabled=True,
                 help="Experimental feature. Currently unavailable until a replacement model is configured.",
             )
 
@@ -106,7 +106,7 @@ if "app_mode" not in st.session_state:
 if db.status_message:
     st.info("Keyword search is active. Semantic search is not configured on this installation.")
 
-mode = st.sidebar.radio("Select Mode", ["Search", "AI Chat (Experimental)"], key="app_mode")
+mode = st.sidebar.radio("Select Mode", ["Search", "Ask the Archive (Experimental)"], key="app_mode")
 
 if mode == "Search":
     st.info("Directly search the raw logbook archives. No AI synthesis.")
@@ -214,7 +214,7 @@ if mode == "Search":
     elif st.session_state.consultant_signature:
         st.warning("No matching entries found for this query.")
 
-elif mode == "AI Chat (Experimental)":
-    st.subheader("AI Chat (Experimental)")
+elif mode == "Ask the Archive (Experimental)":
+    st.subheader("Ask the Archive (Experimental)")
     st.warning("Experimental feature: AI answers may be incomplete or inaccurate. Verify claims against the original forum posts.")
     st.info("Currently unavailable while we choose a free replacement model. Archive search is available without an API key.")

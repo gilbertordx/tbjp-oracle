@@ -1,7 +1,7 @@
 # ARCHIVE
 
 Search the local forum archive without an LLM API key. Gemini has been removed;
-AI chat is paused pending selection of a free replacement provider.
+Ask the Archive is paused pending selection of a free replacement provider.
 
 ## Run locally
 
