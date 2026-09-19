@@ -35,4 +35,4 @@ This project evolved from [tbjp-scraper](https://github.com/gilbertordx/tbjp-scr
 
 Run `venv/bin/python src/scraper.py` only when you intend to refresh the forum data.
 rag mode *experimental is unavailable pending selection of a replacement
-model. Future generated answers must be checked against the original source posts.
+model.
