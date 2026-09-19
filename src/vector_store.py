@@ -67,7 +67,8 @@ class TBJPVectorStore:
             self.backend = "fallback"
             self.status_message = (
                 "Running in fallback mode because optional packages "
-                "`langchain-huggingface` and/or `chromadb` are unavailable."
+                "`langchain-huggingface` and/or `chromadb` are unavailable. "
+                "Search uses keyword matching; semantic search is unavailable."
             )
             self._load_fallback_documents()
 

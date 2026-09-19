@@ -1,24 +1,21 @@
-﻿from dotenv import load_dotenv
+from dotenv import load_dotenv
 import html
 import math
 import re
 
 import streamlit as st
 
-from src.llm_engine import TBJPOracleLLM
 from src.vector_store import TBJPVectorStore
 
 load_dotenv()
 
-st.set_page_config(page_title="TBJP Oracle", page_icon="||||-----||||", layout="centered")
+st.set_page_config(page_title="ARCHIVE", page_icon="📚", layout="centered")
 
 
 @st.cache_resource
 def init_system():
     db = TBJPVectorStore()
-    retriever = db.get_retriever(target_results=5)
-    qa_chain = TBJPOracleLLM().build_qa_chain(retriever)
-    return db, qa_chain
+    return db
 
 
 def parse_query_tokens(query: str) -> tuple[list[str], list[str]]:
@@ -80,23 +77,21 @@ def render_source_document(doc, highlight_query: str = "", show_send_button: boo
 
         if show_send_button:
             st.markdown("---")
-            if st.button("Send to Oracle for Analysis", key=f"oracle_{post_id}"):
-                st.session_state.app_mode = "Oracle //Chat"
-                st.session_state.focus_doc = doc
-                st.rerun()
+            st.button(
+                "Analyze with AI (Experimental)", key=f"analyze_{post_id}", disabled=True,
+                help="Experimental feature. Currently unavailable until a replacement model is configured.",
+            )
 
 
-st.title("TBJP Oracle")
-st.markdown("### Structural Bodybuilding & Coaching RAG POC")
+st.title("ARCHIVE")
+st.markdown("Search Jordan Peters’ forum archive.")
 
 try:
-    db, qa_chain = init_system()
+    db = init_system()
 except Exception as e:
     st.error(f"Initialization failed: {e}")
     st.stop()
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 if "consultant_results" not in st.session_state:
     st.session_state.consultant_results = []
 if "page_index" not in st.session_state:
@@ -105,20 +100,25 @@ if "consultant_signature" not in st.session_state:
     st.session_state.consultant_signature = None
 if "consultant_active_query" not in st.session_state:
     st.session_state.consultant_active_query = ""
-if "focus_doc" not in st.session_state:
-    st.session_state.focus_doc = None
 if "app_mode" not in st.session_state:
-    st.session_state.app_mode = "Consultant //Wiki"
+    st.session_state.app_mode = "Search"
 
-mode = st.sidebar.radio("Select Mode", ["Consultant //Wiki", "Oracle //Chat"], key="app_mode")
+if db.status_message:
+    st.info("Keyword search is active. Semantic search is not configured on this installation.")
 
-if mode == "Consultant //Wiki":
+mode = st.sidebar.radio("Select Mode", ["Search", "AI Chat (Experimental)"], key="app_mode")
+
+if mode == "Search":
     st.info("Directly search the raw logbook archives. No AI synthesis.")
 
     with st.expander("Search Engine Guide", expanded=False):
-        st.markdown("##### SEMANTIC SEARCH // Exact Match OFF")
-        st.markdown("Searches by *concept* and meaning. If you search `INSULIN`, results can include posts about carbohydrates, diet, and blood sugar even when the exact word is absent.")
-        st.markdown("> **Best for:** Broad research and discovering related principles.")
+        if db.backend == "chroma":
+            st.markdown("##### SEMANTIC SEARCH // Exact Match OFF")
+            st.markdown("Searches by *concept* and meaning. If you search `INSULIN`, results can include posts about carbohydrates, diet, and blood sugar even when the exact word is absent.")
+            st.markdown("> **Best for:** Broad research and discovering related principles.")
+        else:
+            st.markdown("##### KEYWORD SEARCH // Exact Match OFF")
+            st.markdown("Finds posts containing query words and ranks them by matching words. Enable Exact Match to require every word or quoted phrase.")
 
         st.markdown("---")
 
@@ -130,7 +130,7 @@ if mode == "Consultant //Wiki":
         st.markdown("---")
 
         st.markdown("##### INTERFACE CONTROLS")
-        st.markdown("- **Sort:** Relevance (vector distance), Newest, or Oldest.\n- **Result Scope:** Controls retrieval depth (Top 100 vs All Matches).\n- **Page Size:** Controls how many entries render per page.")
+        st.markdown("- **Sort:** Relevance, Newest, or Oldest.\n- **Result Scope:** Controls retrieval depth (Top 100 vs All Matches).\n- **Page Size:** Controls how many entries render per page.")
 
     col_scope, col_sort, col_page, col_exact = st.columns([1, 1, 1, 1])
     with col_scope:
@@ -214,57 +214,7 @@ if mode == "Consultant //Wiki":
     elif st.session_state.consultant_signature:
         st.warning("No matching entries found for this query.")
 
-elif mode == "Oracle //Chat":
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    if st.session_state.focus_doc:
-        st.success(
-            f"🔍 **Focus Mode Active:** Analyzing Post ID {st.session_state.focus_doc.metadata.get('post_id')}"
-        )
-        if st.button("Clear Focus"):
-            st.session_state.focus_doc = None
-            st.rerun()
-
-    if prompt := st.chat_input("Ask Jordan..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-
-        chat_history = []
-        user_msg = None
-        for msg in st.session_state.messages[:-1]:
-            if msg["role"] == "user":
-                user_msg = msg["content"]
-            elif msg["role"] == "assistant" and user_msg:
-                chat_history.append((user_msg, msg["content"]))
-                user_msg = None
-
-        with st.chat_message("assistant"):
-            with st.spinner("Synthesising..."):
-                try:
-                    if st.session_state.focus_doc:
-                        custom_prompt = qa_chain.combine_docs_chain.llm_chain.prompt.format(
-                            context=st.session_state.focus_doc.page_content,
-                            question=prompt,
-                        )
-                        raw_response = qa_chain.combine_docs_chain.llm_chain.llm.invoke(custom_prompt)
-                        answer = getattr(raw_response, "content", str(raw_response))
-                        st.markdown(answer)
-                        st.session_state.messages.append({"role": "assistant", "content": answer})
-                        render_source_document(st.session_state.focus_doc, show_send_button=False)
-                    else:
-                        response = qa_chain.invoke({"question": prompt, "chat_history": chat_history})
-                        answer = response.get("answer", "No answer generated.")
-                        st.markdown(answer)
-                        st.session_state.messages.append({"role": "assistant", "content": answer})
-
-                        source_docs = response.get("source_documents", [])
-                        if source_docs:
-                            st.caption("Source Logs:")
-                            for doc in source_docs:
-                                render_source_document(doc, show_send_button=False)
-
-                except Exception as e:
-                    st.error(f"Query failed: {e}")
+elif mode == "AI Chat (Experimental)":
+    st.subheader("AI Chat (Experimental)")
+    st.warning("Experimental feature: AI answers may be incomplete or inaccurate. Verify claims against the original forum posts.")
+    st.info("Currently unavailable while we choose a free replacement model. Archive search is available without an API key.")
