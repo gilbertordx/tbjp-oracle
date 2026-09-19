@@ -40,12 +40,15 @@ class ArchiveLLM:
             f"post {doc.metadata.get('post_id', 'unknown')}]\n{doc.page_content}"
             for doc in documents
         )
+        # Keep prompts small enough for a local model while retaining the most
+        # relevant complete replies returned by the archive retriever.
+        context = context[:24000]
         response = requests.post(
             f"{self.base_url}/api/chat",
             json={"model": self.model, "stream": False, "options": {"temperature": 0.25},
                   "messages": [{"role": "system", "content": SYSTEM_PROMPT.format(context=context)},
                                {"role": "user", "content": question}]},
-            timeout=180,
+            timeout=600,
         )
         response.raise_for_status()
         return response.json()["message"]["content"]

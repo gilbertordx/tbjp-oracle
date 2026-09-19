@@ -239,7 +239,7 @@ elif mode == "rag mode *experimental":
         with st.chat_message("assistant"):
             with st.spinner("thinking from the archive..."):
                 try:
-                    documents = db.hybrid_search(prompt, k=12, exact_match=False, sort_by="relevance")
+                    documents = db.hybrid_search(prompt, k=6, exact_match=False, sort_by="relevance")
                     if not documents:
                         answer = "I couldn't find enough relevant replies in the archive to answer that."
                     elif not llm.available():
