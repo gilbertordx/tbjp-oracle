@@ -6,6 +6,7 @@ import re
 import streamlit as st
 
 from src.vector_store import TBJPVectorStore
+from src.llm_engine import ArchiveLLM
 
 load_dotenv()
 
@@ -16,6 +17,11 @@ st.set_page_config(page_title="archive", page_icon="📚", layout="centered")
 def init_system():
     db = TBJPVectorStore()
     return db
+
+
+@st.cache_resource
+def init_llm():
+    return ArchiveLLM()
 
 
 def parse_query_tokens(query: str) -> tuple[list[str], list[str]]:
@@ -218,4 +224,29 @@ if mode == "search":
 elif mode == "rag mode *experimental":
     st.subheader("rag mode *experimental")
     st.warning("experimental feature: ai answers may be incomplete or inaccurate. verify claims against the original forum posts.")
-    st.info("currently unavailable while we choose a free replacement model. archive search is available without an api key.")
+    llm = init_llm()
+    if not llm.available():
+        st.info(f"install the free local model first: `ollama pull {llm.model}`")
+    if "rag_messages" not in st.session_state:
+        st.session_state.rag_messages = []
+    for message in st.session_state.rag_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    if prompt := st.chat_input("ask about training, nutrition, or programming"):
+        st.session_state.rag_messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        with st.chat_message("assistant"):
+            with st.spinner("thinking from the archive..."):
+                try:
+                    documents = db.hybrid_search(prompt, k=12, exact_match=False, sort_by="relevance")
+                    if not documents:
+                        answer = "I couldn't find enough relevant replies in the archive to answer that."
+                    elif not llm.available():
+                        answer = f"ollama is not ready. install the local model with: `ollama pull {llm.model}`"
+                    else:
+                        answer = llm.answer(prompt, documents)
+                    st.markdown(answer)
+                    st.session_state.rag_messages.append({"role": "assistant", "content": answer})
+                except Exception as exc:
+                    st.error(f"rag request failed: {exc}")

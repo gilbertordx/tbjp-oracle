@@ -1,7 +1,7 @@
 # ARCHIVE
 
 Search the local forum archive without an LLM API key. Gemini has been removed;
-rag mode *experimental is paused pending selection of a free replacement provider.
+rag mode *experimental uses a local Ollama model.
 
 ## Run locally
 
