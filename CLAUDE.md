@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-ARCHIVE searches Jordan Peters’ forum posts. Search works without an API key. Ask the Archive (Experimental) is currently unavailable pending selection of a replacement model.
+ARCHIVE searches Jordan Peters’ forum posts. Search works without an API key. rag mode *experimental is currently unavailable pending selection of a replacement model.
 
 ## Commands
 
@@ -35,4 +35,4 @@ pip install -r requirements.txt
 
 **Experimental feature**: Gemini has been removed. `src/llm_engine.py` is a placeholder until a replacement model is selected.
 
-**UI**: `app.py` offers Search and Ask the Archive (Experimental). Search supports scope, sort, page size, exact matches, and source evidence. The experimental page clearly states its limitations and current unavailability. The vector store is cached via `@st.cache_resource`.
+**UI**: `app.py` offers Search and rag mode *experimental. Search supports scope, sort, page size, exact matches, and source evidence. The experimental page clearly states its limitations and current unavailability. The vector store is cached via `@st.cache_resource`.

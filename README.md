@@ -1,7 +1,7 @@
 # ARCHIVE
 
 Search the local forum archive without an LLM API key. Gemini has been removed;
-Ask the Archive is paused pending selection of a free replacement provider.
+rag mode *experimental is paused pending selection of a free replacement provider.
 
 ## Run locally
 
@@ -34,5 +34,5 @@ This project evolved from [tbjp-scraper](https://github.com/gilbertordx/tbjp-scr
 - `src/llm_engine.py` records the paused experimental feature; no model is currently configured.
 
 Run `venv/bin/python src/scraper.py` only when you intend to refresh the forum data.
-Ask the Archive (Experimental) is unavailable pending selection of a replacement
+rag mode *experimental is unavailable pending selection of a replacement
 model. Future generated answers must be checked against the original source posts.

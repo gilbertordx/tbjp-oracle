@@ -9,7 +9,7 @@ from src.vector_store import TBJPVectorStore
 
 load_dotenv()
 
-st.set_page_config(page_title="ARCHIVE", page_icon="📚", layout="centered")
+st.set_page_config(page_title="archive", page_icon="📚", layout="centered")
 
 
 @st.cache_resource
@@ -59,37 +59,37 @@ def highlight_text(text: str, query: str) -> str:
 
 
 def render_source_document(doc, highlight_query: str = "", show_send_button: bool = True):
-    """Standardized renderer for a logbook entry."""
-    post_id = doc.metadata.get("post_id", "Unknown ID")
-    post_date = doc.metadata.get("date", "Unknown Date")
-    thread_title = doc.metadata.get("thread_title", doc.metadata.get("title", "Unknown Thread"))
+    """standardized renderer for a logbook entry."""
+    post_id = doc.metadata.get("post_id", "unknown id")
+    post_date = doc.metadata.get("date", "unknown date")
+    thread_title = doc.metadata.get("thread_title", doc.metadata.get("title", "unknown thread"))
 
-    with st.expander(f"{post_date} | {thread_title} (ID: {post_id})"):
+    with st.expander(f"{post_date} | {thread_title} (id: {post_id})"):
         if highlight_query.strip():
             highlighted_title = highlight_text(thread_title, highlight_query).replace("<br>", "")
-            st.markdown(f"**Thread:** {highlighted_title}", unsafe_allow_html=True)
+            st.markdown(f"**thread:** {highlighted_title}", unsafe_allow_html=True)
             st.markdown("---")
             st.markdown(highlight_text(doc.page_content, highlight_query), unsafe_allow_html=True)
         else:
-            st.markdown(f"**Thread:** {thread_title}")
+            st.markdown(f"**thread:** {thread_title}")
             st.markdown("---")
             st.markdown(doc.page_content)
 
         if show_send_button:
             st.markdown("---")
             st.button(
-                "Ask the Archive (Experimental)", key=f"analyze_{post_id}", disabled=True,
-                help="Experimental feature. Currently unavailable until a replacement model is configured.",
+                "rag mode *experimental", key=f"analyze_{post_id}", disabled=True,
+                help="experimental feature. currently unavailable until a replacement model is configured.",
             )
 
 
-st.title("ARCHIVE")
-st.markdown("Search Jordan Peters’ forum archive.")
+st.title("archive")
+st.markdown("search jordan peters’ forum archive.")
 
 try:
     db = init_system()
 except Exception as e:
-    st.error(f"Initialization failed: {e}")
+    st.error(f"initialization failed: {e}")
     st.stop()
 
 if "consultant_results" not in st.session_state:
@@ -100,74 +100,75 @@ if "consultant_signature" not in st.session_state:
     st.session_state.consultant_signature = None
 if "consultant_active_query" not in st.session_state:
     st.session_state.consultant_active_query = ""
-if "app_mode" not in st.session_state:
-    st.session_state.app_mode = "Search"
+if st.session_state.get("app_mode") not in ("search", "rag mode *experimental"):
+    previous_mode = st.session_state.get("app_mode", "search")
+    st.session_state.app_mode = "search" if previous_mode.lower() == "search" else "rag mode *experimental"
 
 if db.status_message:
-    st.info("Keyword search is active. Semantic search is not configured on this installation.")
+    st.info("keyword search is active. semantic search is not configured on this installation.")
 
-mode = st.sidebar.radio("Select Mode", ["Search", "Ask the Archive (Experimental)"], key="app_mode")
+mode = st.sidebar.radio("select mode", ["search", "rag mode *experimental"], key="app_mode")
 
-if mode == "Search":
-    st.info("Directly search the raw logbook archives. No AI synthesis.")
+if mode == "search":
+    st.info("directly search the raw logbook archives. no ai synthesis.")
 
-    with st.expander("Search Engine Guide", expanded=False):
+    with st.expander("search engine guide", expanded=False):
         if db.backend == "chroma":
-            st.markdown("##### SEMANTIC SEARCH // Exact Match OFF")
-            st.markdown("Searches by *concept* and meaning. If you search `INSULIN`, results can include posts about carbohydrates, diet, and blood sugar even when the exact word is absent.")
-            st.markdown("> **Best for:** Broad research and discovering related principles.")
+            st.markdown("##### semantic search // exact match off")
+            st.markdown("searches by *concept* and meaning. if you search `insulin`, results can include posts about carbohydrates, diet, and blood sugar even when the exact word is absent.")
+            st.markdown("> **best for:** broad research and discovering related principles.")
         else:
-            st.markdown("##### KEYWORD SEARCH // Exact Match OFF")
-            st.markdown("Finds posts containing query words and ranks them by matching words. Enable Exact Match to require every word or quoted phrase.")
+            st.markdown("##### keyword search // exact match off")
+            st.markdown("finds posts containing query words and ranks them by matching words. enable exact match to require every word or quoted phrase.")
 
         st.markdown("---")
 
-        st.markdown("##### LEXICAL SEARCH // Exact Match ON ")
-        st.markdown("Searches for direct text matches in Thread Title and Post Content.")
-        st.markdown("- **Multiple Words (AND):** `TEST MAST` returns posts containing both terms.\n- **Exact Phrase:** Use quotes, eg., `STIFF LEG`, to match the phrase exactly.")
-        st.markdown("> **Best for:** Pinpointing specific dosages, protocols, or literal forum queries.")
+        st.markdown("##### lexical search // exact match on ")
+        st.markdown("searches for direct text matches in thread title and post content.")
+        st.markdown("- **multiple words (and):** `test mast` returns posts containing both terms.\n- **exact phrase:** use quotes, eg., `stiff leg`, to match the phrase exactly.")
+        st.markdown("> **best for:** pinpointing specific dosages, protocols, or literal forum queries.")
 
         st.markdown("---")
 
-        st.markdown("##### INTERFACE CONTROLS")
-        st.markdown("- **Sort:** Relevance, Newest, or Oldest.\n- **Result Scope:** Controls retrieval depth (Top 100 vs All Matches).\n- **Page Size:** Controls how many entries render per page.")
+        st.markdown("##### interface controls")
+        st.markdown("- **sort:** relevance, newest, or oldest.\n- **result scope:** controls retrieval depth (top 100 vs all matches).\n- **page size:** controls how many entries render per page.")
 
     col_scope, col_sort, col_page, col_exact = st.columns([1, 1, 1, 1])
     with col_scope:
         result_scope = st.selectbox(
-            "Result Scope",
-            options=["All matches", "Top 50", "Top 100", "Top 200", "Top 500"],
+            "result scope",
+            options=["all matches", "top 50", "top 100", "top 200", "top 500"],
             index=0,
         )
     with col_sort:
-        sort_by = st.selectbox("Sort", options=["Relevance", "Newest", "Oldest"], index=0)
+        sort_by = st.selectbox("sort", options=["relevance", "newest", "oldest"], index=0)
     with col_page:
-        page_size = st.selectbox("Page Size", options=[10, 20, 50, 100], index=1)
+        page_size = st.selectbox("page size", options=[10, 20, 50, 100], index=1)
     with col_exact:
-        exact_match_val = st.selectbox("Exact Match", options=["OFF", "ON"], index=0)
-        exact_match = exact_match_val == "ON"
+        exact_match_val = st.selectbox("exact match", options=["off", "on"], index=0)
+        exact_match = exact_match_val == "on"
 
     search_query = st.text_input(
-        "Search the Logbook",
-        placeholder="Use quotes for exact phrase: \"trap bar\" rdl",
+        "search the logbook",
+        placeholder="use quotes for exact phrase: \"trap bar\" rdl",
     )
 
-    search_clicked = st.button("Search", type="primary")
+    search_clicked = st.button("search", type="primary")
 
     scope_to_k = {
-        "All matches": 0,
-        "Top 50": 50,
-        "Top 100": 100,
-        "Top 200": 200,
-        "Top 500": 500,
+        "all matches": 0,
+        "top 50": 50,
+        "top 100": 100,
+        "top 200": 200,
+        "top 500": 500,
     }
     search_signature = (search_query.strip(), result_scope, sort_by, exact_match)
 
     if search_clicked:
         if not search_query.strip():
-            st.warning("Enter a search query first.")
+            st.warning("enter a search query first.")
         else:
-            with st.spinner(f"Searching for '{search_query}'..."):
+            with st.spinner(f"searching for '{search_query}'..."):
                 try:
                     k_value = scope_to_k[result_scope]
                     results = db.hybrid_search(
@@ -181,10 +182,10 @@ if mode == "Search":
                     st.session_state.consultant_signature = search_signature
                     st.session_state.consultant_active_query = search_query
                 except Exception as e:
-                    st.error(f"Search failed: {e}")
+                    st.error(f"search failed: {e}")
 
     if st.session_state.consultant_signature and search_signature != st.session_state.consultant_signature:
-        st.caption("Filters changed. Click Search to refresh results.")
+        st.caption("filters changed. click search to refresh results.")
 
     total_results = len(st.session_state.consultant_results)
     if total_results > 0:
@@ -196,25 +197,25 @@ if mode == "Search":
 
         nav_prev, nav_meta, nav_next = st.columns([1, 2, 1])
         with nav_prev:
-            if st.button("Previous", disabled=st.session_state.page_index <= 0):
+            if st.button("previous", disabled=st.session_state.page_index <= 0):
                 st.session_state.page_index -= 1
                 st.rerun()
         with nav_meta:
             st.markdown(
-                f"**Showing {start_index + 1}-{end_index} of {total_results}**  "
-                + f"(Page {st.session_state.page_index + 1}/{total_pages})"
+                f"**showing {start_index + 1}-{end_index} of {total_results}**  "
+                + f"(page {st.session_state.page_index + 1}/{total_pages})"
             )
         with nav_next:
-            if st.button("Next", disabled=st.session_state.page_index >= total_pages - 1):
+            if st.button("next", disabled=st.session_state.page_index >= total_pages - 1):
                 st.session_state.page_index += 1
                 st.rerun()
 
         for doc in st.session_state.consultant_results[start_index:end_index]:
             render_source_document(doc, highlight_query=st.session_state.consultant_active_query)
     elif st.session_state.consultant_signature:
-        st.warning("No matching entries found for this query.")
+        st.warning("no matching entries found for this query.")
 
-elif mode == "Ask the Archive (Experimental)":
-    st.subheader("Ask the Archive (Experimental)")
-    st.warning("Experimental feature: AI answers may be incomplete or inaccurate. Verify claims against the original forum posts.")
-    st.info("Currently unavailable while we choose a free replacement model. Archive search is available without an API key.")
+elif mode == "rag mode *experimental":
+    st.subheader("rag mode *experimental")
+    st.warning("experimental feature: ai answers may be incomplete or inaccurate. verify claims against the original forum posts.")
+    st.info("currently unavailable while we choose a free replacement model. archive search is available without an api key.")
