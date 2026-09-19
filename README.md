@@ -19,3 +19,20 @@ Stop Streamlit before running ingestion.
 
 For semantic retrieval, install `requirements.txt` and ingest again with that
 backend before launching the app. This downloads the embedding model locally.
+
+## Data pipeline
+
+This project evolved from [tbjp-scraper](https://github.com/gilbertordx/tbjp-scraper).
+
+`src/scraper.py` → `data/raw_forum_data.json` → `ingest.py` → vector store → `app.py`
+
+- `src/scraper.py` downloads forum replies and backs up existing raw data before overwriting it.
+- `src/schema.py` defines forum posts; `src/pipeline.py` chunks long posts.
+- `ingest.py` preserves source metadata and ingests in batches of 5,000.
+- `src/vector_store.py` provides Chroma semantic retrieval or keyword retrieval.
+- `mock_data_gen.py` seeds sample posts for local testing.
+- `src/llm_engine.py` records the paused experimental feature; no model is currently configured.
+
+Run `venv/bin/python src/scraper.py` only when you intend to refresh the forum data.
+Ask the Archive (Experimental) is unavailable pending selection of a replacement
+model. Future generated answers must be checked against the original source posts.

@@ -1,4 +1,5 @@
 pydantic
+streamlit
 langchain-core
 langchain-text-splitters
 langchain-community
@@ -8,4 +9,3 @@ sentence-transformers
 python-dotenv
 requests
 beautifulsoup4
-streamlit
