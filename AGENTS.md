@@ -94,3 +94,8 @@ Scope: `d:\Gilberto\tbjp-oracle`
 - When data contract changes (scraper output, chunk metadata, retrieval payload), update docs/readme notes in same change.
 - Keep commits scoped and traceable (scraper, ingest, UI, infra).
 - Do not silently alter behavior with hidden fallbacks; log major decision points.
+
+## User preference: save every change
+- Make a small Git commit after each completed, verified change; avoid leaving completed work uncommitted.
+- Never commit credentials, generated indexes, or unrelated user changes.
+- Report whether commits are local only or have been pushed; local commits alone are not remote backups.
