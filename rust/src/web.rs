@@ -86,70 +86,95 @@ pub fn highlight_text(text: &str, query: &str) -> String {
 }
 
 const STYLE: &str = r#"
-:root{--bg:#f6f7f9;--card:#fff;--ink:#1b1f24;--muted:#6a7380;--line:#e3e6eb;--accent:#d9480f;--accent-ink:#fff;--mark:#ffe08a;--note:#e8f0ff;--warn:#fff1de}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--card:#171b21;--ink:#e8eaed;--muted:#8f98a5;--line:#262c34;--accent:#ff7a3d;--accent-ink:#1a1006;--mark:#6b5300;--note:#16233a;--warn:#33240f}}
 *{box-sizing:border-box}
-body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);max-width:900px;margin:0 auto;padding:0 1rem 4rem;line-height:1.55}
-header{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;padding:1.6rem 0 1rem}
-header h1{margin:0;font-size:1.7rem;letter-spacing:-.02em}header h1 span{color:var(--accent)}
-header p{margin:0;color:var(--muted);flex:1;min-width:14rem}
-header nav a,header nav strong{padding:.3rem .7rem;border-radius:999px;font-size:.9rem;text-decoration:none}
-header nav a{color:var(--muted);border:1px solid var(--line)}header nav a:hover{color:var(--ink)}
-header nav strong{background:var(--accent);color:var(--accent-ink)}
-form.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.9rem;margin:1rem 0}
-label{display:flex;flex-direction:column;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);gap:.25rem}
-select,input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem}
-input[type=text]{flex:1;min-width:16rem;font-size:1rem}
-select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px}
-button{font:inherit;font-weight:600;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:.55rem 1.2rem;cursor:pointer}
-button:hover{filter:brightness(1.08)}
-details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:.6rem 0;padding:.7rem 1rem}
-details[open]{border-color:var(--accent)}
-summary{cursor:pointer;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}
-summary::before{content:"\25B8";color:var(--accent);margin-right:.5rem}details[open] summary::before{content:"\25BE"}
-details hr{border:0;border-top:1px solid var(--line);margin:.7rem 0}
-details div{white-space:normal;overflow-wrap:anywhere}
+html[data-theme=streamlit]{--bg:#fff;--sec:#f0f2f6;--ink:#31333f;--muted:rgba(49,51,63,.6);--line:rgba(49,51,63,.2);--accent:#ff4b4b;--info-bg:rgba(28,131,225,.1);--info-ink:#004280;--warn-bg:rgba(255,227,18,.1);--warn-ink:#926c05;--mark:#fff3a3}
+@media (prefers-color-scheme:dark){html[data-theme=streamlit]{--bg:#0e1117;--sec:#262730;--ink:#fafafa;--muted:rgba(250,250,250,.6);--line:rgba(250,250,250,.2);--info-bg:rgba(61,157,243,.2);--info-ink:#c7ebff;--warn-bg:rgba(255,227,18,.2);--warn-ink:#ffffc2;--mark:#6b5300}}
+html[data-theme=kali]{--bg:#0a0c10;--sec:#0a0c10;--ink:#c9d1d9;--muted:#6e7681;--line:#21262d;--accent:#3b8eea;--info-bg:#0d1f12;--info-ink:#3fb950;--warn-bg:#2a1a0a;--warn-ink:#e3b341;--mark:#e3b341}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Sans Pro","Source Sans 3",-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.6}
+.app{display:flex;min-height:100vh}
+aside.sb{width:244px;flex:none;background:var(--sec);padding:2rem 1.2rem;position:sticky;top:0;height:100vh;overflow:auto}
+aside.sb h4{margin:0 0 .6rem;font-size:.875rem;font-weight:400;color:var(--muted)}
+aside.sb a,aside.sb strong{display:flex;align-items:flex-start;gap:.5rem;padding:.25rem 0;color:var(--ink);text-decoration:none;font-weight:400}
+aside.sb a::before,aside.sb strong::before{content:"";margin-top:.3rem;width:1rem;height:1rem;border-radius:50%;border:1px solid var(--line);flex:none}
+aside.sb strong::before{border:5px solid var(--accent);background:#fff}
+aside.sb .themebtn{margin-top:2rem}
+main{flex:1;min-width:0;max-width:730px;margin:0 auto;padding:4rem 1.2rem 6rem}
+header h1{font-size:2.75rem;font-weight:700;margin:0;padding:1.25rem 0 1rem;letter-spacing:-.005em;line-height:1.2}
+header h1 span{color:inherit}
+header p{margin:0 0 1rem}
+header nav{display:none}header .ps{display:none}
+.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+form.row{display:block;margin:1rem 0}
+form.row .cols+input{margin-top:1rem}
+label{display:flex;flex-direction:column;font-size:.875rem;color:var(--ink);gap:.25rem}
+select,input[type=text]{font:inherit;color:var(--ink);background:var(--sec);border:1px solid transparent;border-radius:.5rem;padding:.5rem .75rem;width:100%}
+select:focus,input:focus{outline:0;border-color:var(--accent)}
+input[type=text]{display:block;margin-bottom:1rem}
+button,.themebtn{font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:.5rem;padding:.4rem 1rem;cursor:pointer}
+button[type=submit]{background:var(--accent);border-color:var(--accent);color:#fff}
+button:hover{border-color:var(--accent);color:var(--accent)}button[type=submit]:hover{color:#fff;filter:brightness(1.08)}
+details{border:1px solid var(--line);border-radius:.5rem;margin:0 0 1rem;padding:.6rem 1rem}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"\2335";font-size:.8rem;color:var(--muted);flex:none}details[open] summary::after{transform:rotate(180deg)}
+details hr{border:0;border-top:1px solid var(--line);margin:1rem 0}
+details div{overflow-wrap:anywhere}
 mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 .1em}
-nav.pager{display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:1rem 0;color:var(--muted);font-size:.9rem}
-nav.pager a{color:var(--accent);text-decoration:none;font-weight:600}
-.note,.warn{padding:.6rem .9rem;border-radius:10px;font-size:.9rem;margin:.6rem 0}
-.note{background:var(--note)}.warn{background:var(--warn)}
-code{background:var(--line);padding:.1em .35em;border-radius:4px}
+nav.pager{display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:1rem 0}
+nav.pager a{border:1px solid var(--line);border-radius:.5rem;padding:.3rem .9rem;color:var(--ink);text-decoration:none}
+nav.pager a:hover{border-color:var(--accent);color:var(--accent)}
+nav.pager>span:first-child:empty{width:5rem}
+.note,.warn{padding:1rem;border-radius:.5rem;margin:0 0 1rem}
+.note{background:var(--info-bg);color:var(--info-ink)}.warn{background:var(--warn-bg);color:var(--warn-ink)}
+code{background:var(--sec);padding:.1em .35em;border-radius:4px;font-size:.875em}
 a{color:var(--accent)}h3{margin-top:1.6rem}
-html[data-theme=kali]{--bg:#0a0c10;--card:#0a0c10;--ink:#c9d1d9;--muted:#6e7681;--line:#21262d;--accent:#3b8eea;--accent-ink:#0a0c10;--mark:#e3b341;--note:#0d1f12;--warn:#2a1a0a}
-html[data-theme=kali] body{font-family:"Cascadia Mono","Fira Code",ui-monospace,Consolas,monospace;font-size:14px;max-width:980px}
-html[data-theme=kali] header{display:block;padding:1.2rem 0 .4rem}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line);color:var(--muted)}
+@media (max-width:820px){aside.sb{display:none}html[data-theme=streamlit] header nav{display:flex;gap:.6rem;margin-bottom:1rem}header nav a,header nav strong{padding:.2rem .7rem;border:1px solid var(--line);border-radius:999px;font-weight:400;text-decoration:none;color:var(--ink)}.cols{grid-template-columns:1fr 1fr}}
+/* kali terminal theme */
+html[data-theme=kali] aside.sb{display:none}
+html[data-theme=kali] main{max-width:980px;padding:1rem 1rem 4rem}
+html[data-theme=kali] body{font-family:"Cascadia Mono","Fira Code",ui-monospace,Consolas,monospace;font-size:14px}
 html[data-theme=kali] header h1,html[data-theme=kali] header p{display:none}
-html[data-theme=kali] .ps{display:block;white-space:pre;line-height:1.35}
-html[data-theme=kali] .ps b{color:#3b8eea;font-weight:400}html[data-theme=kali] .ps i{color:#3fb950;font-style:normal}
-html[data-theme=kali] .ps u{color:#e6edf3;text-decoration:none}
-html[data-theme=kali] header nav{margin:.5rem 0 0}
-html[data-theme=kali] header nav a,html[data-theme=kali] header nav strong,html[data-theme=kali] #theme{border-radius:0;font-family:inherit;padding:.1rem .5rem;border:1px solid var(--line);background:none;color:var(--muted)}
+html[data-theme=kali] header .ps{display:block;white-space:pre;line-height:1.35}
+html[data-theme=kali] .ps b{color:#3b8eea;font-weight:400}html[data-theme=kali] .ps i{color:#3fb950;font-style:normal}html[data-theme=kali] .ps u{color:#e6edf3;text-decoration:none}
+html[data-theme=kali] header nav{display:flex;gap:.5rem;margin:.5rem 0 1rem}
+html[data-theme=kali] header nav a,html[data-theme=kali] header nav strong,html[data-theme=kali] .themebtn{border-radius:0;font-family:inherit;padding:.1rem .5rem;border:1px solid var(--line);background:none;color:var(--muted);text-decoration:none;font-weight:400}
 html[data-theme=kali] header nav strong{color:#3fb950;border-color:#3fb950}
-html[data-theme=kali] form.row,html[data-theme=kali] details{border-radius:0;border:0;border-left:2px solid var(--line);background:none}
+html[data-theme=kali] form.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;border-left:2px solid var(--line);padding:.9rem}
+html[data-theme=kali] .cols{display:contents}
+html[data-theme=kali] details{border:0;border-left:2px solid var(--line);border-radius:0}
 html[data-theme=kali] details[open]{border-left-color:#3b8eea}
-html[data-theme=kali] select,html[data-theme=kali] input[type=text]{border-radius:0;border:0;border-bottom:1px solid #3b8eea;background:#0d1117;color:#3fb950;font-family:inherit}
+html[data-theme=kali] select,html[data-theme=kali] input[type=text]{border-radius:0;border:0;border-bottom:1px solid #3b8eea;background:#0d1117;color:#3fb950;font-family:inherit;width:auto}
+html[data-theme=kali] input[type=text]{flex:1;min-width:16rem;margin:0}
 html[data-theme=kali] label{color:#6e7681;text-transform:lowercase}
-html[data-theme=kali] button{border-radius:0;background:none;color:#3fb950;border:1px solid #3fb950;font-family:inherit;font-weight:400}
-html[data-theme=kali] button:hover{background:#3fb950;color:#0a0c10;filter:none}
-html[data-theme=kali] .note{border-left:2px solid #3fb950;border-radius:0;color:#3fb950}
-html[data-theme=kali] .warn{border-left:2px solid #e3b341;border-radius:0;color:#e3b341}
-html[data-theme=kali] mark{background:none;color:#0a0c10;background:#e3b341;border-radius:0}
-html[data-theme=kali] summary::before{content:"[+] ";color:#3fb950;margin:0}html[data-theme=kali] details[open] summary::before{content:"[-] "}
-html[data-theme=kali] summary{font-weight:400;color:#e6edf3}
+html[data-theme=kali] button{border-radius:0;background:none;color:#3fb950;border:1px solid #3fb950;font-family:inherit}
+html[data-theme=kali] button:hover{background:#3fb950;color:#0a0c10}
+html[data-theme=kali] .note,html[data-theme=kali] .warn{border-radius:0;border-left:2px solid currentColor}
+html[data-theme=kali] mark{background:#e3b341;color:#0a0c10;border-radius:0}
+html[data-theme=kali] summary{justify-content:flex-start}
+html[data-theme=kali] summary::after{content:none}
+html[data-theme=kali] summary::before{content:"[+] ";color:#3fb950;white-space:pre}html[data-theme=kali] details[open] summary::before{content:"[-] "}
+html[data-theme=kali] nav.pager a{border:0;padding:0;color:#3b8eea;font-weight:700}
 html[data-theme=kali] code{background:#161b22;color:#3fb950}
-html[data-theme=kali] a{color:#3b8eea}
-html[data-theme=kali] nav.pager a{color:#3b8eea}
-.ps,#theme{display:none}
-html[data-theme=kali] #theme{display:inline-block;cursor:pointer;font-size:.9rem}
-html[data-theme=clean] #theme{display:inline-block;margin-left:.4rem;cursor:pointer;color:var(--muted);background:none;border:1px solid var(--line);border-radius:999px;font:inherit;font-size:.9rem;padding:.3rem .7rem}
 "#;
+
+const SEARCH_GUIDE: &str = "<details><summary>search engine guide</summary><div>\
+<h5>keyword search // exact match off</h5>\
+<p>finds posts containing query words and ranks them by matching words. enable exact match to require every word or quoted phrase.</p>\
+<hr><h5>lexical search // exact match on</h5>\
+<p>searches for direct text matches in thread title and post content.</p>\
+<ul><li><strong>multiple words (and):</strong> <code>test mast</code> returns posts containing both terms.</li>\
+<li><strong>exact phrase:</strong> use quotes, eg., <code>stiff leg</code>, to match the phrase exactly.</li></ul>\
+<blockquote><strong>best for:</strong> pinpointing specific dosages, protocols, or literal forum queries.</blockquote>\
+<hr><h5>interface controls</h5>\
+<ul><li><strong>sort:</strong> relevance, newest, or oldest.</li><li><strong>result scope:</strong> controls retrieval depth (top 100 vs all matches).</li>\
+<li><strong>page size:</strong> controls how many entries render per page.</li></ul></div></details>";
 
 fn page(title: &str, body: &str) -> Html<String> {
     Html(format!(
-        "<!doctype html><html lang=\"en\" data-theme=\"kali\"><head><script>try{{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script><meta charset=\"utf-8\">\
+        "<!doctype html><html lang=\"en\" data-theme=\"streamlit\"><head><script>try{{var t=localStorage.getItem('theme');if(t=='kali'||t=='streamlit')document.documentElement.dataset.theme=t}}catch(e){{}}</script><meta charset=\"utf-8\">\
          <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\
-         <title>{}</title><style>{STYLE}</style></head><body>{body}<script>document.getElementById('theme').onclick=function(){{var d=document.documentElement,n=d.dataset.theme=='kali'?'clean':'kali';d.dataset.theme=n;try{{localStorage.setItem('theme',n)}}catch(e){{}}}}</script></body></html>",
+         <title>{}</title><style>{STYLE}</style></head><body>{body}</main></div><script>document.querySelectorAll('.themebtn').forEach(function(b){{b.onclick=function(){{var d=document.documentElement,n=d.dataset.theme=='kali'?'streamlit':'kali';d.dataset.theme=n;try{{localStorage.setItem('theme',n)}}catch(e){{}}}}}})</script></body></html>",
         escape(title)
     ))
 }
@@ -158,13 +183,14 @@ fn nav(active: &str) -> String {
     let link = |href: &str, label: &str| {
         if label == active { format!("<strong>{label}</strong>") } else { format!("<a href=\"{href}\">{label}</a>") }
     };
+    let (search, rag) = (link("/", "search"), link("/rag", "rag mode *experimental"));
     format!(
-        "<header><h1>arch<span>ive</span></h1><p>search jordan peters\u{2019} forum archive</p>\
+        "<div class=\"app\"><aside class=\"sb\"><h4>select mode</h4>{search}{rag}\
+         <button type=\"button\" class=\"themebtn\">theme</button></aside><main>\
+         <header><h1>archive</h1><p>search jordan peters\u{2019} forum archive.</p>\
          <span class=\"ps\"><b>\u{250C}\u{2500}\u{2500}(</b><i>archive\u{327F}jordan</i><b>)-[</b><u>~/forum</u><b>]</b>\n<b>\u{2514}\u{2500}</b><i>$</i> <u>{}</u></span>\
-         <nav>{} {} <button type=\"button\" id=\"theme\">theme</button></nav></header>",
+         <nav>{search} {rag} <button type=\"button\" class=\"themebtn\">theme</button></nav></header>",
         escape(active),
-        link("/", "search"),
-        link("/rag", "rag mode *experimental")
     )
 }
 
@@ -219,9 +245,11 @@ async fn search_page(State(state): State<Arc<AppState>>, Query(p): Query<SearchP
         body.push_str("<p class=\"warn\">the index is empty. run <code>tbjp-oracle ingest</code> (or <code>seed</code>) first.</p>");
     }
     body.push_str("<p class=\"note\">keyword search is active. enable exact match to require every word or quoted phrase.</p>");
+    body.push_str("<p class=\"note\">directly search the raw logbook archives. no ai synthesis.</p>");
+    body.push_str(SEARCH_GUIDE);
 
     body.push_str(&format!(
-        "<form class=\"row\" method=\"get\" action=\"/\">{}{}{}{}\
+        "<form class=\"row\" method=\"get\" action=\"/\"><div class=\"cols\">{}{}{}{}</div>\
          <input type=\"text\" name=\"q\" value=\"{}\" placeholder=\"use quotes for exact phrase: &quot;trap bar&quot; rdl\">\
          <button type=\"submit\">search</button></form>",
         select("scope", "result scope", &["all matches", "top 50", "top 100", "top 200", "top 500"], &scope),
@@ -262,13 +290,13 @@ async fn search_page(State(state): State<Arc<AppState>>, Query(p): Query<SearchP
     };
     body.push_str(&format!(
         "<nav class=\"pager\">{}<span><strong>showing {}-{} of {}</strong> (page {}/{})</span>{}</nav>",
-        if page_index > 0 { link(page_index - 1, "previous") } else { String::new() },
+        if page_index > 0 { link(page_index - 1, "previous") } else { "<span></span>".to_string() },
         start + 1,
         end,
         total,
         page_index + 1,
         total_pages,
-        if page_index + 1 < total_pages { link(page_index + 1, "next") } else { String::new() },
+        if page_index + 1 < total_pages { link(page_index + 1, "next") } else { "<span></span>".to_string() },
     ));
     for doc in &results[start..end] {
         body.push_str(&render_document(doc, &query));
