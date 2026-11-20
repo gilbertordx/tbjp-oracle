@@ -85,13 +85,38 @@ pub fn highlight_text(text: &str, query: &str) -> String {
     combined.replace_all(&escaped, "<mark>${1}</mark>").replace('\n', "<br>")
 }
 
-const STYLE: &str = "body{font-family:system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;color:#222}\
-h1{margin-bottom:.2rem}form.row{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0}\
-label{display:flex;flex-direction:column;font-size:.8rem;color:#555}\
-input[type=text]{flex:1;min-width:16rem;padding:.5rem;font-size:1rem}\
-button{padding:.5rem 1rem;font-size:1rem}details{border:1px solid #ddd;border-radius:6px;margin:.5rem 0;padding:.4rem .8rem}\
-summary{cursor:pointer;font-weight:600}mark{background:#ffe58a}nav.pager{display:flex;gap:1rem;align-items:center;margin:1rem 0}\
-.note{background:#eef4ff;padding:.6rem .8rem;border-radius:6px}.warn{background:#fff4e5;padding:.6rem .8rem;border-radius:6px}";
+const STYLE: &str = r#"
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1b1f24;--muted:#6a7380;--line:#e3e6eb;--accent:#d9480f;--accent-ink:#fff;--mark:#ffe08a;--note:#e8f0ff;--warn:#fff1de}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--card:#171b21;--ink:#e8eaed;--muted:#8f98a5;--line:#262c34;--accent:#ff7a3d;--accent-ink:#1a1006;--mark:#6b5300;--note:#16233a;--warn:#33240f}}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);max-width:900px;margin:0 auto;padding:0 1rem 4rem;line-height:1.55}
+header{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;padding:1.6rem 0 1rem}
+header h1{margin:0;font-size:1.7rem;letter-spacing:-.02em}header h1 span{color:var(--accent)}
+header p{margin:0;color:var(--muted);flex:1;min-width:14rem}
+header nav a,header nav strong{padding:.3rem .7rem;border-radius:999px;font-size:.9rem;text-decoration:none}
+header nav a{color:var(--muted);border:1px solid var(--line)}header nav a:hover{color:var(--ink)}
+header nav strong{background:var(--accent);color:var(--accent-ink)}
+form.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.9rem;margin:1rem 0}
+label{display:flex;flex-direction:column;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);gap:.25rem}
+select,input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem}
+input[type=text]{flex:1;min-width:16rem;font-size:1rem}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px}
+button{font:inherit;font-weight:600;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:.55rem 1.2rem;cursor:pointer}
+button:hover{filter:brightness(1.08)}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:.6rem 0;padding:.7rem 1rem}
+details[open]{border-color:var(--accent)}
+summary{cursor:pointer;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}
+summary::before{content:"\25B8";color:var(--accent);margin-right:.5rem}details[open] summary::before{content:"\25BE"}
+details hr{border:0;border-top:1px solid var(--line);margin:.7rem 0}
+details div{white-space:normal;overflow-wrap:anywhere}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 .1em}
+nav.pager{display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:1rem 0;color:var(--muted);font-size:.9rem}
+nav.pager a{color:var(--accent);text-decoration:none;font-weight:600}
+.note,.warn{padding:.6rem .9rem;border-radius:10px;font-size:.9rem;margin:.6rem 0}
+.note{background:var(--note)}.warn{background:var(--warn)}
+code{background:var(--line);padding:.1em .35em;border-radius:4px}
+a{color:var(--accent)}h3{margin-top:1.6rem}
+"#;
 
 fn page(title: &str, body: &str) -> Html<String> {
     Html(format!(
@@ -107,7 +132,7 @@ fn nav(active: &str) -> String {
         if label == active { format!("<strong>{label}</strong>") } else { format!("<a href=\"{href}\">{label}</a>") }
     };
     format!(
-        "<h1>archive</h1><p>search jordan peters\u{2019} forum archive. {} | {}</p>",
+        "<header><h1>arch<span>ive</span></h1><p>search jordan peters\u{2019} forum archive</p><nav>{} {}</nav></header>",
         link("/", "search"),
         link("/rag", "rag mode *experimental")
     )
