@@ -1,5 +1,10 @@
 # ARCHIVE
 
+> **Rust remaster on this branch.** A Rust version of this app lives in [`rust/`](rust),
+> with a guided walkthrough for learning Rust from it in
+> [`docs/RUST_LEARNING.md`](docs/RUST_LEARNING.md). The Python version below is unchanged.
+> Quick start: `cargo run --release --manifest-path rust/Cargo.toml -- ingest` then `-- serve`.
+
 Search the local forum archive without an LLM API key. Gemini has been removed;
 rag mode *experimental uses a local Ollama model.
 

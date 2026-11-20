@@ -20,3 +20,7 @@ streamlit.out.log
 streamlit.err.log
 
 wifi_reconnect.ps1
+
+# Rust remaster
+rust/target/
+data/index/
