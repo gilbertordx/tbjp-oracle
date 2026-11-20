@@ -116,13 +116,40 @@ nav.pager a{color:var(--accent);text-decoration:none;font-weight:600}
 .note{background:var(--note)}.warn{background:var(--warn)}
 code{background:var(--line);padding:.1em .35em;border-radius:4px}
 a{color:var(--accent)}h3{margin-top:1.6rem}
+html[data-theme=kali]{--bg:#0a0c10;--card:#0a0c10;--ink:#c9d1d9;--muted:#6e7681;--line:#21262d;--accent:#3b8eea;--accent-ink:#0a0c10;--mark:#e3b341;--note:#0d1f12;--warn:#2a1a0a}
+html[data-theme=kali] body{font-family:"Cascadia Mono","Fira Code",ui-monospace,Consolas,monospace;font-size:14px;max-width:980px}
+html[data-theme=kali] header{display:block;padding:1.2rem 0 .4rem}
+html[data-theme=kali] header h1,html[data-theme=kali] header p{display:none}
+html[data-theme=kali] .ps{display:block;white-space:pre;line-height:1.35}
+html[data-theme=kali] .ps b{color:#3b8eea;font-weight:400}html[data-theme=kali] .ps i{color:#3fb950;font-style:normal}
+html[data-theme=kali] .ps u{color:#e6edf3;text-decoration:none}
+html[data-theme=kali] header nav{margin:.5rem 0 0}
+html[data-theme=kali] header nav a,html[data-theme=kali] header nav strong,html[data-theme=kali] #theme{border-radius:0;font-family:inherit;padding:.1rem .5rem;border:1px solid var(--line);background:none;color:var(--muted)}
+html[data-theme=kali] header nav strong{color:#3fb950;border-color:#3fb950}
+html[data-theme=kali] form.row,html[data-theme=kali] details{border-radius:0;border:0;border-left:2px solid var(--line);background:none}
+html[data-theme=kali] details[open]{border-left-color:#3b8eea}
+html[data-theme=kali] select,html[data-theme=kali] input[type=text]{border-radius:0;border:0;border-bottom:1px solid #3b8eea;background:#0d1117;color:#3fb950;font-family:inherit}
+html[data-theme=kali] label{color:#6e7681;text-transform:lowercase}
+html[data-theme=kali] button{border-radius:0;background:none;color:#3fb950;border:1px solid #3fb950;font-family:inherit;font-weight:400}
+html[data-theme=kali] button:hover{background:#3fb950;color:#0a0c10;filter:none}
+html[data-theme=kali] .note{border-left:2px solid #3fb950;border-radius:0;color:#3fb950}
+html[data-theme=kali] .warn{border-left:2px solid #e3b341;border-radius:0;color:#e3b341}
+html[data-theme=kali] mark{background:none;color:#0a0c10;background:#e3b341;border-radius:0}
+html[data-theme=kali] summary::before{content:"[+] ";color:#3fb950;margin:0}html[data-theme=kali] details[open] summary::before{content:"[-] "}
+html[data-theme=kali] summary{font-weight:400;color:#e6edf3}
+html[data-theme=kali] code{background:#161b22;color:#3fb950}
+html[data-theme=kali] a{color:#3b8eea}
+html[data-theme=kali] nav.pager a{color:#3b8eea}
+.ps,#theme{display:none}
+html[data-theme=kali] #theme{display:inline-block;cursor:pointer;font-size:.9rem}
+html[data-theme=clean] #theme{display:inline-block;margin-left:.4rem;cursor:pointer;color:var(--muted);background:none;border:1px solid var(--line);border-radius:999px;font:inherit;font-size:.9rem;padding:.3rem .7rem}
 "#;
 
 fn page(title: &str, body: &str) -> Html<String> {
     Html(format!(
-        "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">\
+        "<!doctype html><html lang=\"en\" data-theme=\"kali\"><head><script>try{{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script><meta charset=\"utf-8\">\
          <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\
-         <title>{}</title><style>{STYLE}</style></head><body>{body}</body></html>",
+         <title>{}</title><style>{STYLE}</style></head><body>{body}<script>document.getElementById('theme').onclick=function(){{var d=document.documentElement,n=d.dataset.theme=='kali'?'clean':'kali';d.dataset.theme=n;try{{localStorage.setItem('theme',n)}}catch(e){{}}}}</script></body></html>",
         escape(title)
     ))
 }
@@ -132,7 +159,10 @@ fn nav(active: &str) -> String {
         if label == active { format!("<strong>{label}</strong>") } else { format!("<a href=\"{href}\">{label}</a>") }
     };
     format!(
-        "<header><h1>arch<span>ive</span></h1><p>search jordan peters\u{2019} forum archive</p><nav>{} {}</nav></header>",
+        "<header><h1>arch<span>ive</span></h1><p>search jordan peters\u{2019} forum archive</p>\
+         <span class=\"ps\"><b>\u{250C}\u{2500}\u{2500}(</b><i>archive\u{327F}jordan</i><b>)-[</b><u>~/forum</u><b>]</b>\n<b>\u{2514}\u{2500}</b><i>$</i> <u>{}</u></span>\
+         <nav>{} {} <button type=\"button\" id=\"theme\">theme</button></nav></header>",
+        escape(active),
         link("/", "search"),
         link("/rag", "rag mode *experimental")
     )
