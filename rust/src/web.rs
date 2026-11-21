@@ -86,76 +86,68 @@ pub fn highlight_text(text: &str, query: &str) -> String {
 }
 
 const STYLE: &str = r#"
-*{box-sizing:border-box}
-html[data-theme=streamlit]{--bg:#fff;--sec:#f0f2f6;--ink:#31333f;--muted:rgba(49,51,63,.6);--line:rgba(49,51,63,.2);--accent:#ff4b4b;--info-bg:rgba(28,131,225,.1);--info-ink:#004280;--warn-bg:rgba(255,227,18,.1);--warn-ink:#926c05;--mark:#fff3a3}
-@media (prefers-color-scheme:dark){html[data-theme=streamlit]{--bg:#0e1117;--sec:#262730;--ink:#fafafa;--muted:rgba(250,250,250,.6);--line:rgba(250,250,250,.2);--info-bg:rgba(61,157,243,.2);--info-ink:#c7ebff;--warn-bg:rgba(255,227,18,.2);--warn-ink:#ffffc2;--mark:#6b5300}}
-html[data-theme=kali]{--bg:#0a0c10;--sec:#0a0c10;--ink:#c9d1d9;--muted:#6e7681;--line:#21262d;--accent:#3b8eea;--info-bg:#0d1f12;--info-ink:#3fb950;--warn-bg:#2a1a0a;--warn-ink:#e3b341;--mark:#e3b341}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Sans Pro","Source Sans 3",-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.6}
-.app{display:flex;min-height:100vh}
-aside.sb{width:244px;flex:none;background:var(--sec);padding:2rem 1.2rem;position:sticky;top:0;height:100vh;overflow:auto}
-aside.sb h4{margin:0 0 .6rem;font-size:.875rem;font-weight:400;color:var(--muted)}
-aside.sb a,aside.sb strong{display:flex;align-items:flex-start;gap:.5rem;padding:.25rem 0;color:var(--ink);text-decoration:none;font-weight:400}
-aside.sb a::before,aside.sb strong::before{content:"";margin-top:.3rem;width:1rem;height:1rem;border-radius:50%;border:1px solid var(--line);flex:none}
-aside.sb strong::before{border:5px solid var(--accent);background:#fff}
-aside.sb .themebtn{margin-top:2rem}
-main{flex:1;min-width:0;max-width:730px;margin:0 auto;padding:4rem 1.2rem 6rem}
-header h1{font-size:2.75rem;font-weight:700;margin:0;padding:1.25rem 0 1rem;letter-spacing:-.005em;line-height:1.2}
-header h1 span{color:inherit}
-header p{margin:0 0 1rem}
-header nav{display:none}header .ps{display:none}
-.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-form.row{display:block;margin:1rem 0}
-form.row .cols+input{margin-top:1rem}
-label{display:flex;flex-direction:column;font-size:.875rem;color:var(--ink);gap:.25rem}
-select,input[type=text]{font:inherit;color:var(--ink);background:var(--sec);border:1px solid transparent;border-radius:.5rem;padding:.5rem .75rem;width:100%}
-select:focus,input:focus{outline:0;border-color:var(--accent)}
-input[type=text]{display:block;margin-bottom:1rem}
-button,.themebtn{font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:.5rem;padding:.4rem 1rem;cursor:pointer}
-button[type=submit]{background:var(--accent);border-color:var(--accent);color:#fff}
-button:hover{border-color:var(--accent);color:var(--accent)}button[type=submit]:hover{color:#fff;filter:brightness(1.08)}
-details{border:1px solid var(--line);border-radius:.5rem;margin:0 0 1rem;padding:.6rem 1rem}
-summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+*{box-sizing:border-box;border-radius:0!important}
+html[data-theme=dune]{--bg:#ecdcb9;--surface:#f4e9cf;--ink:#2a1b10;--muted:#7a6347;--line:#c9b48a;--strong:#2a1b10;--accent:#b8470f;--accent-ink:#f8ecd2;--link:#1d4f7a;--mark:#e8a33d;--mark-ink:#2a1b10}
+@media (prefers-color-scheme:dark){html[data-theme=dune]{--bg:#15100b;--surface:#1e1610;--ink:#ead9b8;--muted:#9a8460;--line:#4a3826;--strong:#ead9b8;--accent:#f08a2b;--accent-ink:#15100b;--link:#6ab0e0;--mark:#b4651c;--mark-ink:#fff4de}}
+html[data-theme=kali]{--bg:#0a0c10;--surface:#0a0c10;--ink:#c9d1d9;--muted:#6e7681;--line:#21262d;--strong:#c9d1d9;--accent:#3b8eea;--accent-ink:#0a0c10;--link:#3b8eea;--mark:#e3b341;--mark-ink:#0a0c10}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-size:17px;line-height:1.6}
+main{max-width:860px;margin:0 auto;padding:0 1.2rem 5rem}
+.mono,label,.themebtn,button,nav.pager,header .tag,header nav,summary time,.note,.warn{font-family:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,monospace}
+header{padding:2.4rem 0 0}
+header .top{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap}
+header h1{margin:0;font-size:2.6rem;letter-spacing:.32em;text-transform:uppercase;font-weight:700;line-height:1}
+header .tag{margin:.7rem 0 0;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header .ps{display:none}
+header nav{display:flex;gap:1.4rem;align-items:center;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+header nav a,header nav strong{padding:.3rem 0;text-decoration:none;color:var(--muted);border-bottom:2px solid transparent}
+header nav a:hover{color:var(--ink)}
+header nav strong{color:var(--ink);border-bottom-color:var(--accent)}
+.ripple{height:10px;margin:1.3rem 0 1.6rem;background:repeating-linear-gradient(135deg,var(--accent) 0 2px,transparent 2px 7px);border-top:1px solid var(--strong);border-bottom:1px solid var(--strong)}
+form.row{display:flex;flex-wrap:wrap;gap:.9rem;align-items:flex-end;border:1px solid var(--strong);background:var(--surface);padding:1rem;margin:0 0 1.4rem}
+.cols{display:contents}
+label{display:flex;flex-direction:column;gap:.3rem;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+select,input[type=text]{font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1px solid var(--strong);padding:.5rem .7rem}
+select{appearance:none;padding-right:1.8rem;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 14px) 55%,calc(100% - 9px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+input[type=text]{flex:1 1 18rem;min-width:0;font-family:ui-monospace,Consolas,monospace}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px}
+button{font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:var(--accent);color:var(--accent-ink);border:1px solid var(--strong);padding:.62rem 1.4rem;font-weight:700}
+button:hover{filter:brightness(1.1)}
+.themebtn{background:none;color:var(--muted);border:1px solid var(--line);padding:.25rem .6rem;font-size:.7rem;font-weight:400}
+.note,.warn{font-size:.85rem;padding:.7rem 1rem;margin:0 0 .8rem;border:1px solid var(--line);border-left:5px solid var(--link);background:var(--surface)}
+.warn{border-left-color:var(--accent)}
+details{border:1px solid var(--line);background:var(--surface);margin:0 0 .7rem}
+details[open]{border-color:var(--strong)}
+summary{cursor:pointer;list-style:none;padding:.7rem 1rem;display:flex;gap:.8rem;align-items:baseline}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"\2335";font-size:.8rem;color:var(--muted);flex:none}details[open] summary::after{transform:rotate(180deg)}
-details hr{border:0;border-top:1px solid var(--line);margin:1rem 0}
-details div{overflow-wrap:anywhere}
-mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 .1em}
-nav.pager{display:flex;gap:1rem;align-items:center;justify-content:space-between;margin:1rem 0}
-nav.pager a{border:1px solid var(--line);border-radius:.5rem;padding:.3rem .9rem;color:var(--ink);text-decoration:none}
-nav.pager a:hover{border-color:var(--accent);color:var(--accent)}
-nav.pager>span:first-child:empty{width:5rem}
-.note,.warn{padding:1rem;border-radius:.5rem;margin:0 0 1rem}
-.note{background:var(--info-bg);color:var(--info-ink)}.warn{background:var(--warn-bg);color:var(--warn-ink)}
-code{background:var(--sec);padding:.1em .35em;border-radius:4px;font-size:.875em}
-a{color:var(--accent)}h3{margin-top:1.6rem}
-blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line);color:var(--muted)}
-@media (max-width:820px){aside.sb{display:none}html[data-theme=streamlit] header nav{display:flex;gap:.6rem;margin-bottom:1rem}header nav a,header nav strong{padding:.2rem .7rem;border:1px solid var(--line);border-radius:999px;font-weight:400;text-decoration:none;color:var(--ink)}.cols{grid-template-columns:1fr 1fr}}
+summary::before{content:"+";font-family:ui-monospace,monospace;color:var(--accent);font-weight:700;flex:none;width:1ch}
+details[open] summary::before{content:"\2212"}
+details[open] summary{border-bottom:1px solid var(--line)}
+details>div,details>p,details>hr{margin-left:1rem;margin-right:1rem}
+details>p{margin-top:.9rem}details>div{padding-bottom:1rem;overflow-wrap:anywhere}
+details hr{border:0;border-top:1px dashed var(--line);margin-top:.6rem;margin-bottom:.9rem}
+mark{background:var(--mark);color:var(--mark-ink);padding:0 .12em}
+nav.pager{display:flex;justify-content:space-between;align-items:center;margin:1.2rem 0;font-size:.82rem;letter-spacing:.06em;color:var(--muted)}
+nav.pager a{color:var(--link);text-decoration:none;text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+nav.pager a:hover{text-decoration:underline}
+code{font-family:ui-monospace,Consolas,monospace;background:var(--bg);border:1px solid var(--line);padding:.05em .35em;font-size:.85em}
+a{color:var(--link)}h3{margin-top:1.8rem;letter-spacing:.1em;text-transform:uppercase;font-size:.9rem}
+h5{margin:.9rem 0 .3rem;font-family:ui-monospace,monospace;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+blockquote{margin:.6rem 0;padding-left:1rem;border-left:3px solid var(--accent);color:var(--muted)}
+@media (max-width:620px){header h1{font-size:1.8rem;letter-spacing:.2em}}
 /* kali terminal theme */
-html[data-theme=kali] aside.sb{display:none}
-html[data-theme=kali] main{max-width:980px;padding:1rem 1rem 4rem}
 html[data-theme=kali] body{font-family:"Cascadia Mono","Fira Code",ui-monospace,Consolas,monospace;font-size:14px}
-html[data-theme=kali] header h1,html[data-theme=kali] header p{display:none}
-html[data-theme=kali] header .ps{display:block;white-space:pre;line-height:1.35}
+html[data-theme=kali] header .top>div:first-child,html[data-theme=kali] .ripple{display:none}html[data-theme=kali] header nav{margin-bottom:1rem}
+html[data-theme=kali] header{padding:1.2rem 0 0}
+html[data-theme=kali] header .ps{display:block;white-space:pre;line-height:1.35;margin-bottom:.5rem}
 html[data-theme=kali] .ps b{color:#3b8eea;font-weight:400}html[data-theme=kali] .ps i{color:#3fb950;font-style:normal}html[data-theme=kali] .ps u{color:#e6edf3;text-decoration:none}
-html[data-theme=kali] header nav{display:flex;gap:.5rem;margin:.5rem 0 1rem}
-html[data-theme=kali] header nav a,html[data-theme=kali] header nav strong,html[data-theme=kali] .themebtn{border-radius:0;font-family:inherit;padding:.1rem .5rem;border:1px solid var(--line);background:none;color:var(--muted);text-decoration:none;font-weight:400}
-html[data-theme=kali] header nav strong{color:#3fb950;border-color:#3fb950}
-html[data-theme=kali] form.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;border-left:2px solid var(--line);padding:.9rem}
-html[data-theme=kali] .cols{display:contents}
-html[data-theme=kali] details{border:0;border-left:2px solid var(--line);border-radius:0}
-html[data-theme=kali] details[open]{border-left-color:#3b8eea}
-html[data-theme=kali] select,html[data-theme=kali] input[type=text]{border-radius:0;border:0;border-bottom:1px solid #3b8eea;background:#0d1117;color:#3fb950;font-family:inherit;width:auto}
-html[data-theme=kali] input[type=text]{flex:1;min-width:16rem;margin:0}
-html[data-theme=kali] label{color:#6e7681;text-transform:lowercase}
-html[data-theme=kali] button{border-radius:0;background:none;color:#3fb950;border:1px solid #3fb950;font-family:inherit}
-html[data-theme=kali] button:hover{background:#3fb950;color:#0a0c10}
-html[data-theme=kali] .note,html[data-theme=kali] .warn{border-radius:0;border-left:2px solid currentColor}
-html[data-theme=kali] mark{background:#e3b341;color:#0a0c10;border-radius:0}
-html[data-theme=kali] summary{justify-content:flex-start}
-html[data-theme=kali] summary::after{content:none}
-html[data-theme=kali] summary::before{content:"[+] ";color:#3fb950;white-space:pre}html[data-theme=kali] details[open] summary::before{content:"[-] "}
-html[data-theme=kali] nav.pager a{border:0;padding:0;color:#3b8eea;font-weight:700}
-html[data-theme=kali] code{background:#161b22;color:#3fb950}
+html[data-theme=kali] header nav{margin-bottom:1rem}
+html[data-theme=kali] form.row{border:0;border-left:2px solid var(--line)}
+html[data-theme=kali] select,html[data-theme=kali] input[type=text]{border:0;border-bottom:1px solid #3b8eea;background:#0d1117;color:#3fb950}
+html[data-theme=kali] button{background:none;color:#3fb950;border-color:#3fb950;font-weight:400}
+html[data-theme=kali] button:hover{background:#3fb950;color:#0a0c10;filter:none}
+html[data-theme=kali] .note{border-left-color:#3fb950;color:#3fb950}html[data-theme=kali] .warn{color:#e3b341}
+html[data-theme=kali] summary::before{content:"[+]";width:auto;color:#3fb950}html[data-theme=kali] details[open] summary::before{content:"[-]"}
+html[data-theme=kali] details{border:0;border-left:2px solid var(--line);background:none}
 "#;
 
 const SEARCH_GUIDE: &str = "<details><summary>search engine guide</summary><div>\
@@ -172,9 +164,9 @@ const SEARCH_GUIDE: &str = "<details><summary>search engine guide</summary><div>
 
 fn page(title: &str, body: &str) -> Html<String> {
     Html(format!(
-        "<!doctype html><html lang=\"en\" data-theme=\"streamlit\"><head><script>try{{var t=localStorage.getItem('theme');if(t=='kali'||t=='streamlit')document.documentElement.dataset.theme=t}}catch(e){{}}</script><meta charset=\"utf-8\">\
+        "<!doctype html><html lang=\"en\" data-theme=\"dune\"><head><script>try{{var t=localStorage.getItem('theme');if(t=='kali'||t=='dune')document.documentElement.dataset.theme=t}}catch(e){{}}</script><meta charset=\"utf-8\">\
          <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\
-         <title>{}</title><style>{STYLE}</style></head><body>{body}</main></div><script>document.querySelectorAll('.themebtn').forEach(function(b){{b.onclick=function(){{var d=document.documentElement,n=d.dataset.theme=='kali'?'streamlit':'kali';d.dataset.theme=n;try{{localStorage.setItem('theme',n)}}catch(e){{}}}}}})</script></body></html>",
+         <title>{}</title><style>{STYLE}</style></head><body>{body}</main><script>document.querySelectorAll('.themebtn').forEach(function(b){{b.onclick=function(){{var d=document.documentElement,n=d.dataset.theme=='kali'?'dune':'kali';d.dataset.theme=n;try{{localStorage.setItem('theme',n)}}catch(e){{}}}}}})</script></body></html>",
         escape(title)
     ))
 }
@@ -185,11 +177,9 @@ fn nav(active: &str) -> String {
     };
     let (search, rag) = (link("/", "search"), link("/rag", "rag mode *experimental"));
     format!(
-        "<div class=\"app\"><aside class=\"sb\"><h4>select mode</h4>{search}{rag}\
-         <button type=\"button\" class=\"themebtn\">theme</button></aside><main>\
-         <header><h1>archive</h1><p>search jordan peters\u{2019} forum archive.</p>\
-         <span class=\"ps\"><b>\u{250C}\u{2500}\u{2500}(</b><i>archive\u{327F}jordan</i><b>)-[</b><u>~/forum</u><b>]</b>\n<b>\u{2514}\u{2500}</b><i>$</i> <u>{}</u></span>\
-         <nav>{search} {rag} <button type=\"button\" class=\"themebtn\">theme</button></nav></header>",
+        "<main><header><span class=\"ps\"><b>\u{250C}\u{2500}\u{2500}(</b><i>archive\u{327F}jordan</i><b>)-[</b><u>~/forum</u><b>]</b>\n<b>\u{2514}\u{2500}</b><i>$</i> <u>{}</u></span>\
+         <div class=\"top\"><div><h1>archive</h1><p class=\"tag\">jordan peters\u{2019} forum archive</p></div>\
+         <nav>{search}{rag}<button type=\"button\" class=\"themebtn\">theme</button></nav></div><div class=\"ripple\"></div></header>",
         escape(active),
     )
 }
@@ -246,7 +236,6 @@ async fn search_page(State(state): State<Arc<AppState>>, Query(p): Query<SearchP
     }
     body.push_str("<p class=\"note\">keyword search is active. enable exact match to require every word or quoted phrase.</p>");
     body.push_str("<p class=\"note\">directly search the raw logbook archives. no ai synthesis.</p>");
-    body.push_str(SEARCH_GUIDE);
 
     body.push_str(&format!(
         "<form class=\"row\" method=\"get\" action=\"/\"><div class=\"cols\">{}{}{}{}</div>\
@@ -258,6 +247,8 @@ async fn search_page(State(state): State<Arc<AppState>>, Query(p): Query<SearchP
         select("exact", "exact match", &["off", "on"], if exact { "on" } else { "off" }),
         escape(&query),
     ));
+
+    body.push_str(SEARCH_GUIDE);
 
     if query.trim().is_empty() {
         return page("archive", &body);
